@@ -87,7 +87,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "hamidullanishonboyev9@gmail.com"
 EMAIL_HOST_PASSWORD = "bsfpvxmvznobrulo"
-DEFAULT_FROM_EMAIL = "Hamidulla <hamidullanishonboyev9@gmail.com>"
+DEFAULT_FROM_EMAIL = "Online tabib <hamidullanishonboyev9@gmail.com>"
 
 
 ##EMAIL_HOST_PASSWORD = "bsfpvxmvznobrulo"
