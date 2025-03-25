@@ -92,10 +92,16 @@ DEFAULT_FROM_EMAIL = "Online tabib <hamidullanishonboyev9@gmail.com>"
 
 
 ##EMAIL_HOST_PASSWORD = "bsfpvxmvznobrulo"
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
