@@ -1,10 +1,6 @@
 from django.contrib import admin
-from .models import User, UserEducation, AdditionalUniversity
+from .models import User, UserEducation, AdditionalUniversity, Experience, Extra_work
 
 admin.site.register([UserEducation, AdditionalUniversity])
-
-
-
-@admin.register(User)
-class UserViewAdmin(admin.ModelAdmin):
-    fields = ['first_name', 'last_name', 'passport', 'email',]
+admin.site.register([Experience, Extra_work])
+admin.site.register(User)

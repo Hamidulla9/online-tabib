@@ -15,6 +15,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
         model = Experience
         fields = '__all__'
 
+
     def create(self, validated_data):
         additional_universities_data = self.context['request'].data.get('additional_universities', [])
         experiences = Experience.objects.create(**validated_data)

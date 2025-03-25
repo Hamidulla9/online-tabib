@@ -9,12 +9,18 @@ class Experience(models.Model):
     lavozimi = models.CharField(max_length=255)
     ishga_kirgan_yili = models.DateField()
 
+    def __str__(self):
+        return self.nomi
+
 class Extra_work(models.Model):
     experience = models.ForeignKey(Experience, on_delete=models.CASCADE, related_name='experience')
     ish_joyi = models.CharField(max_length=255)
     nomi = models.CharField(max_length=255)
     lavozimi = models.CharField(max_length=255)
     ishga_kirgan_yili = models.DateField()
+
+    def __str__(self):
+        return self.nomi
 
 
 class UserEducation(models.Model):
@@ -34,6 +40,9 @@ class AdditionalUniversity(models.Model):
     yonalish = models.CharField(max_length=255)
     diplom_raqami = models.CharField(max_length=50)
     diplom_fayli = models.FileField(upload_to='diploms/')
+
+    def __str__(self):
+        return self.oqigan_joyi
 
 
 class UserManager(BaseUserManager):
