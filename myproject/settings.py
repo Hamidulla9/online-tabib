@@ -9,7 +9,7 @@ SECRET_KEY = 'django-insecure-1ws8r+(oq&)s+_ag$fo^03^f8igg%)m$-^(-t*z==2dsyi%v01
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'accounts',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
