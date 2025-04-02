@@ -1,9 +1,10 @@
 from django.urls import path
 from .views import RegisterView, VerifyCodeView, UserEducationViewSet, AdditionalUniversityViewSet, UserEducationList, \
-ExperienceViewSet, ExperienceList, Extra_workViewSet
+    ExperienceViewSet, ExperienceList, Extra_workViewSet, LoginView
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name="register"),
+    path("login/", LoginView.as_view(), name="login"),
     path("verify/", VerifyCodeView.as_view(), name="verify"),
     path("eduction/", UserEducationViewSet.as_view(), name="verify"),
     path("eductionlist/", UserEducationList.as_view(), name="verify"),

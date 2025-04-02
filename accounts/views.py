@@ -1,9 +1,25 @@
 from rest_framework import status, generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import UserEducation, AdditionalUniversity, Experience, Extra_work
+from .models import UserEducation, AdditionalUniversity, Experience, Extra_work, User
 from .serializers import RegisterSerializer, VerifyCodeSerializer, UserEducationSerializer, \
-    AdditionalUniversitySerializer, ExperienceSerializer, Extra_workSerializer
+    AdditionalUniversitySerializer, ExperienceSerializer, Extra_workSerializer, UserLoginSerializer
+from django.contrib.auth import login
+
+
+class LoginView(APIView):
+    serializer_class = UserLoginSerializer  # DRF interfeysida faqat email input chiqadi
+
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            user = User.objects.get(email=email)
+            login(request, user)  # Foydalanuvchini tizimga kiritish
+            return Response({"message": "Login muvaffaqiyatli bajarildi", "email": user.email},
+                            status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ExperienceList(generics.ListAPIView):
     queryset = Experience.objects.all()

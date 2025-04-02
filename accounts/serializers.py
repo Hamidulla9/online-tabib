@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.core.mail import send_mail
 from .models import User, UserEducation, AdditionalUniversity, Extra_work, Experience
+import re
 
 
 class Extra_workSerializer(serializers.ModelSerializer):
@@ -67,6 +68,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
     def validate_passport(self, value):
+        if not re.fullmatch(r"^[A-Z]{2}\d{7}$", value):
+            raise serializers.ValidationError("Passport 2 ta harf va 7 ta raqamdan iborat bo‘lishi kerak (masalan, AB1234567).")
         if User.objects.filter(passport=value).exists():
             raise serializers.ValidationError("Ushbu passport allaqachon ishlatilgan.")
         return value
@@ -75,6 +78,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Ushbu email allaqachon ishlatilgan.")
         return value
+
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, data):
+        email = data.get('email')
+        user = User.objects.filter(email=email).first()
+
+        if user:
+            return {'email': user.email}  # Email mavjud bo‘lsa, validatsiyadan o‘tadi
+
+        raise serializers.ValidationError({'email': 'Bunday email hali ro‘yxatdan o‘tmagan'})
 
 
 class VerifyCodeSerializer(serializers.Serializer):

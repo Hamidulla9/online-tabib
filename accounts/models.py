@@ -3,6 +3,8 @@ from django.db import models
 import random
 from django.utils.timezone import now
 
+
+
 class Experience(models.Model):
     ish_joyi = models.CharField(max_length=255)
     nomi = models.CharField(max_length=255)
