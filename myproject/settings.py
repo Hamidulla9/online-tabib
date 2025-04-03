@@ -9,7 +9,8 @@ SECRET_KEY = 'django-insecure-1ws8r+(oq&)s+_ag$fo^03^f8igg%)m$-^(-t*z==2dsyi%v01
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['onlinetabib.bekzodbek-dev.uz', 'localhost', '127.0.0.1']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
