@@ -54,6 +54,33 @@ class VerifyEmailSerializer(serializers.Serializer):
         return attrs
 
 # Email orqali kirish uchun serializer
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+
+        try:
+            user = Foydalanuvchi.objects.get(email=email)
+            if not user.is_email_verified:
+                raise serializers.ValidationError("Email tasdiqlanmagan!")
+
+            # Login muvaffaqiyatli amalga oshdi
+            return {"email": user.email}
+
+        except Foydalanuvchi.DoesNotExist:
+            raise serializers.ValidationError("Bunday foydalanuvchi mavjud emas!")
+
+        return attrs
+
+# Foydalanuvchi profilini olish uchun serializer
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Foydalanuvchi
+        fields = ['email', 'avatar', 'is_email_verified']
+        read_only_fields = ['email', 'is_email_verified']
+
+
 class EmailLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -67,27 +94,3 @@ class EmailLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Bunday foydalanuvchi mavjud emas!")
 
         return attrs
-
-# Login uchun tasdiqlash kodi serializeri
-class VerifyLoginCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    verification_code = serializers.CharField(max_length=6)
-
-    def validate(self, attrs):
-        email = attrs.get('email')
-        verification_code = attrs.get('verification_code')
-        try:
-            user = Foydalanuvchi.objects.get(email=email)
-            if user.verification_code != verification_code:
-                raise serializers.ValidationError("Noto‘g‘ri tasdiqlash kodi!")
-        except Foydalanuvchi.DoesNotExist:
-            raise serializers.ValidationError("Bunday foydalanuvchi mavjud emas!")
-
-        return attrs
-
-# Foydalanuvchi profilini olish uchun serializer
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Foydalanuvchi
-        fields = ['email', 'avatar', 'is_email_verified']
-        read_only_fields = ['email', 'is_email_verified']
