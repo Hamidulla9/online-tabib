@@ -13,6 +13,7 @@ ALLOWED_HOSTS = ['onlinetabib.bekzodbek-dev.uz', 'localhost', '127.0.0.1']
 
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -31,6 +32,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'dj_rest_auth',
     'corsheaders',
+    'chat',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -44,6 +47,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+ASGI_APPLICATION = "myproject.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Redis ishlayotgan port
+        },
+    },
+}
 
 ROOT_URLCONF = 'myproject.urls'
 
