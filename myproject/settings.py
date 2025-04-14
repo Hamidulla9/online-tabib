@@ -109,3 +109,8 @@ STATICFILES_DIRS = [
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',  # ← app nomini to‘g‘ri yoz
+    'django.contrib.auth.backends.ModelBackend',
+]

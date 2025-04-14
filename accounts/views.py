@@ -3,23 +3,36 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import UserEducation, AdditionalUniversity, Experience, Extra_work, User
 from .serializers import RegisterSerializer, VerifyCodeSerializer, UserEducationSerializer, \
-    AdditionalUniversitySerializer, ExperienceSerializer, Extra_workSerializer, UserLoginSerializer
+    AdditionalUniversitySerializer, ExperienceSerializer, Extra_workSerializer, UserLoginSerializer, \
+    ResetPasswordSerializer, ForgotPasswordSerializer
 from django.contrib.auth import login
 
 
+from django.contrib.auth import login
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import UserLoginSerializer
+from .models import User
+
 class LoginView(APIView):
-    serializer_class = UserLoginSerializer  # DRF interfeysida faqat email input chiqadi
+    serializer_class = UserLoginSerializer
 
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
             user = User.objects.get(email=email)
-            login(request, user)  # Foydalanuvchini tizimga kiritish
+
+            # 👇 Backendni qo‘shamiz
+            user.backend = 'django.contrib.auth.backends.ModelBackend'  # yoki sizning backend'laringizdan biri
+
+            login(request, user)
             return Response({"message": "Login muvaffaqiyatli bajarildi", "email": user.email},
                             status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ExperienceList(generics.ListAPIView):
     queryset = Experience.objects.all()
@@ -67,3 +80,20 @@ class VerifyCodeView(APIView):
             return Response({"message": "Ro‘yxatdan o‘tish tasdiqlandi"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ForgotPasswordView(generics.CreateAPIView):
+    serializer_class = ForgotPasswordSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "Tasdiqlash kodi yuborildi"}, status=200)
+
+class ResetPasswordView(generics.CreateAPIView):
+    serializer_class = ResetPasswordSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "Yangi parol yaratildi"}, status=200)

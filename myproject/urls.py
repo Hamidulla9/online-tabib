@@ -39,5 +39,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('client/', include('client.urls')),
     path('doctor/', include('accounts.urls')),
-
 ]
+
