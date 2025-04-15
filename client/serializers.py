@@ -1,8 +1,12 @@
 import random
 import string
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from rest_framework import serializers
 from .models import Foydalanuvchi
+import random
+import string
+
 
 # Tasdiqlash kodi generatsiya qilish funksiyasi
 def generate_verification_code():
@@ -94,3 +98,45 @@ class EmailLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Bunday foydalanuvchi mavjud emas!")
 
         return attrs
+
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not Foydalanuvchi.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Bu email ro'yxatdan o'tmagan.")
+        return value
+
+    def save(self):
+        email = self.validated_data['email']
+        user = Foydalanuvchi.objects.get(email=email)
+        code = ''.join(random.choices(string.digits, k=6))
+        user.verification_code = code
+        user.save()
+        # Shu yerda email jo‘natish funksiyasi bo‘ladi (mock yoki send_email funksiyasi)
+        print(f"Verification code sent to {email}: {code}")
+        return code
+
+class VerifyCodeResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
+    new_password = serializers.CharField(write_only=True)
+
+    def validate(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Parol uzunligi 8 yoki undan kop bo'lishi kerak.")
+        if sum(c.isdigit() for c in value) < 1:
+            raise serializers.ValidationError("Parolda kamida 1 ta raqam bo'lishi kerak.")
+        if sum(c.isalpha() for c in value) < 2:
+            raise serializers.ValidationError("Parolda kamida 2 ta harf bo'lishi kerak.")
+        return value
+
+    def save(self):
+        user = self.validated_data["user"]
+        new_password = self.validated_data["new_password"]
+        user.set_password(new_password)
+        user.verification_code = None  # kodni tozalaymiz
+        user.save()
+        return user
