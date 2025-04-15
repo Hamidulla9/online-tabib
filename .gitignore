@@ -7,7 +7,3 @@ env
 media
 pycache
 staticfiles
-__pycache__/
-*.pyc
-.idea/
-*.iml
