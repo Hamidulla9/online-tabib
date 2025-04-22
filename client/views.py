@@ -4,12 +4,16 @@ import string
 from dj_rest_auth.serializers import LoginSerializer
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import status, generics
+from rest_framework import status, generics, filters  # ✅ bu yerda filters DRFdan
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .models import Doctor, Category, Appointment
 from .serializers import (
     RegisterSerializer, VerifyEmailSerializer,
-    UserProfileSerializer, EmailLoginSerializer, EmailSerializer, VerifyCodeResetPasswordSerializer,
+    UserProfileSerializer, EmailLoginSerializer, EmailSerializer,
+    VerifyCodeResetPasswordSerializer, CategorySerializer,
+    DoctorSerializer, AppointmentSerializer,
 )
 
 # Ro'yxatdan o'tish (Register)
@@ -71,3 +75,28 @@ class VerifyCodeResetPasswordView(APIView):
             serializer.save()
             return Response({"message": "Parol muvaffaqiyatli o‘zgartirildi."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+#####################################
+
+
+class CategoryListView(generics.ListAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+class DoctorListView(generics.ListAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['full_name', 'description', 'category__name']  # qo'shimcha
+
+class AppointmentCreateView(generics.CreateAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+

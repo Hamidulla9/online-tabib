@@ -1,9 +1,10 @@
 import random
 import string
+
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from rest_framework import serializers
-from .models import Foydalanuvchi
+from .models import Foydalanuvchi, Category, Doctor, Appointment
 import random
 import string
 
@@ -119,19 +120,21 @@ class EmailSerializer(serializers.Serializer):
         print(f"Verification code sent to {email}: {code}")
         return code
 
+
 class VerifyCodeResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.CharField(max_length=6)
     new_password = serializers.CharField(write_only=True)
 
-    def validate(self, value):
-        if len(value) < 8:
-            raise serializers.ValidationError("Parol uzunligi 8 yoki undan kop bo'lishi kerak.")
-        if sum(c.isdigit() for c in value) < 1:
-            raise serializers.ValidationError("Parolda kamida 1 ta raqam bo'lishi kerak.")
-        if sum(c.isalpha() for c in value) < 2:
-            raise serializers.ValidationError("Parolda kamida 2 ta harf bo'lishi kerak.")
-        return value
+    def validate(self, data):
+        email = data.get("email")
+        code = data.get("code")
+        try:
+            user = Foydalanuvchi.objects.get(email=email, verification_code=code)
+        except Foydalanuvchi.DoesNotExist:
+            raise serializers.ValidationError("Kod noto‘g‘ri yoki email topilmadi.")
+        data["user"] = user
+        return data
 
     def save(self):
         user = self.validated_data["user"]
@@ -140,3 +143,28 @@ class VerifyCodeResetPasswordSerializer(serializers.Serializer):
         user.verification_code = None  # kodni tozalaymiz
         user.save()
         return user
+
+
+
+
+
+#################################################
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+class DoctorSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        model = Doctor
+        fields = ['id', 'full_name', 'category', 'description', 'image', 'rating']
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = '__all__'
+

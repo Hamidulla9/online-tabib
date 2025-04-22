@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     RegisterAPIView, VerifyEmailAPIView,
     UserProfileAPIView, EmailLoginView,
-    SendResetCodeView, VerifyCodeResetPasswordView
+    SendResetCodeView, VerifyCodeResetPasswordView, CategoryListView, DoctorListView, AppointmentCreateView
 )
 
 urlpatterns = [
@@ -12,4 +12,7 @@ urlpatterns = [
     path('login/', EmailLoginView.as_view(), name='email-login'),
     path('forgot-password/', SendResetCodeView.as_view(), name='forgot-password'),
     path('reset-password/', VerifyCodeResetPasswordView.as_view(), name='reset-password'),
+    path('categories/', CategoryListView.as_view()),
+    path('doctors/', DoctorListView.as_view()),
+    path('appointments/', AppointmentCreateView.as_view()),
 ]
