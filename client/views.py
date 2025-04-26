@@ -40,8 +40,14 @@ class LoginAPIView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            return Response({"message": "Tizimga muvaffaqiyatli kirdingiz!", "email": serializer.validated_data['email']}, status=status.HTTP_200_OK)
+            user = serializer.validated_data['user']
+            return Response({
+                "message": "Tizimga muvaffaqiyatli kirdingiz!",
+                "email": user.email,
+                "username": user.username  # Foydalanuvchining username'ini qo'shish mumkin
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 # Foydalanuvchi profilini olish (Profile)
 class UserProfileAPIView(APIView):
     def get(self, request):

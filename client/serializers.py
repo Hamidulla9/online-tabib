@@ -15,18 +15,23 @@ def generate_verification_code():
 
 # Foydalanuvchi ro'yxatga olish serializeri
 class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = Foydalanuvchi
-        fields = ['email', 'name', 'surname']
+        fields = ['email', 'name', 'surname', 'password']
 
     def create(self, validated_data):
+        password = validated_data.pop('password')
         verification_code = generate_verification_code()
-        user = Foydalanuvchi.objects.create_user(**validated_data)
+
+        user = Foydalanuvchi(**validated_data)
+        user.set_password(password)  # Parolni hashlab saqlaymiz
         user.verification_code = verification_code
-        user.is_active = False  # Foydalanuvchi tasdiqlanmaguncha faol emas
+        user.is_active = False  # Email tasdiqlanmaguncha aktiv emas
         user.save()
 
-        # Email orqali tasdiqlash kodini yuborish
+        # Email yuborish
         send_mail(
             'Tasdiqlash kodi',
             f'Sizning tasdiqlash kodingiz: {verification_code}',
@@ -59,24 +64,31 @@ class VerifyEmailSerializer(serializers.Serializer):
         return attrs
 
 # Email orqali kirish uchun serializer
+from django.contrib.auth import authenticate
+from rest_framework import serializers
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         email = attrs.get('email')
+        password = attrs.get('password')
 
-        try:
-            user = Foydalanuvchi.objects.get(email=email)
-            if not user.is_email_verified:
-                raise serializers.ValidationError("Email tasdiqlanmagan!")
+        # Foydalanuvchini email va parolga qarab tekshiramiz
+        user = authenticate(email=email, password=password)
 
-            # Login muvaffaqiyatli amalga oshdi
-            return {"email": user.email}
+        if user is None:
+            raise serializers.ValidationError("Noto‘g‘ri email yoki parol!")
 
-        except Foydalanuvchi.DoesNotExist:
-            raise serializers.ValidationError("Bunday foydalanuvchi mavjud emas!")
+        # Agar foydalanuvchi emailni tasdiqlamagan bo'lsa
+        if not user.is_email_verified:
+            raise serializers.ValidationError("Email tasdiqlanmagan!")
 
+        # Foydalanuvchi muvaffaqiyatli autentifikatsiya qilindi
+        attrs['user'] = user
         return attrs
+
 
 # Foydalanuvchi profilini olish uchun serializer
 class UserProfileSerializer(serializers.ModelSerializer):
